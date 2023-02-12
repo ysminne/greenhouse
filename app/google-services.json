@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "450965411182",
+    "project_id": "greenhouse---yasmin-athira",
+    "storage_bucket": "greenhouse---yasmin-athira.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:450965411182:android:7d579993a5e94722be5d7f",
+        "android_client_info": {
+          "package_name": "com.example.lab3_yasminathira"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "450965411182-3pdikdm65s7ba62l8g4q7geh2baq6k2n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnp3Vred98LuXKDhKwauMSspjMQRMYw3Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "450965411182-3pdikdm65s7ba62l8g4q7geh2baq6k2n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
