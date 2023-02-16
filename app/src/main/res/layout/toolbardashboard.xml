@@ -15,13 +15,14 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="GREEENHOUSE SYSTEM"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:textAlignment="center"
+            android:layout_centerHorizontal="true"
             android:layout_marginLeft="90dp"
-            android:textSize="20sp"/>
+            android:gravity="center|center_horizontal|center_vertical"
+            android:text="GREEENHOUSE SYSTEM"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
 
     </RelativeLayout>
