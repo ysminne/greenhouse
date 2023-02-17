@@ -31,6 +31,17 @@
             android:textSize="30dp"
             android:textStyle="bold" />
 
+        <Button
+            android:id="@+id/downloadData"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#A4C639"
+            android:backgroundTint="#A4C639"
+            android:drawableLeft="@drawable/baseline_download_24"
+            android:shadowColor="#A4C639"
+            android:text="Download today's data"
+            app:iconTint="#A4C639" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
