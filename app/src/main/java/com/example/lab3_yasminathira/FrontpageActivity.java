@@ -53,11 +53,10 @@ public class FrontpageActivity extends AppCompatActivity {
     {
         String name = etName.getText().toString().trim();
         Intent intent = new Intent(this, MainActivity.class);
-        Toast.makeText(this, "Let's take care of your new plant,  "+name,Toast.LENGTH_SHORT).show();
-
         intent.putExtra(MainActivity.NAME,name);
-
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
+        Toast.makeText(this, "Let's take care of your new plant,  "+name,Toast.LENGTH_SHORT).show();
 
     }
 
@@ -66,6 +65,7 @@ public class FrontpageActivity extends AppCompatActivity {
     public void start(View view) {
 
         Intent intent = new Intent(this, MainActivity.class);
+
         startActivity(intent);
         String name = etName.getText().toString().trim();
         Toast.makeText(this, "Let's take care of your new plant,  "+name,Toast.LENGTH_SHORT).show();

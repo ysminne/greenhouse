@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -65,16 +66,23 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Extract data included in the Intent
-            String t = intent.getStringExtra("value1");
-            String t1 = intent.getStringExtra("value2");
+            String n_val = intent.getStringExtra("n_values");
+            String p_val = intent.getStringExtra("p_values");
+            String k_val = intent.getStringExtra("k_values");
+
             //alert data here
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            str_builder = new StringBuilder();
+            str_builder.append("\nCurrent NPK Values\n");
+            str_builder.append(String.format("N value: %s\n", n_val));
+            str_builder.append(String.format("P value: %s\n", p_val));
+            str_builder.append(String.format("K value: %s\n", k_val));
 
             // Set the message show for the Alert time
-            builder.setMessage("Your plant is having problems");
+            builder.setMessage("Your plant is having problems. Please check your plant to ensure no problems arise" + str_builder.toString());
 
             // Set Alert Title
-            builder.setTitle("Alert !");
+            builder.setTitle("Alert!");
 
             // Set Cancelable false for when the user clicks on the outside the Dialog Box then it will remain show
             builder.setCancelable(false);
@@ -82,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
             // Set the positive button with yes name Lambda OnClickListener method is use of DialogInterface interface.
             builder.setPositiveButton("Yes", (DialogInterface.OnClickListener) (dialog, which) -> {
                 // When the user click yes button then app will close
-                finish();
+                dialog.cancel();
             });
 
             // Set the Negative button with No name Lambda OnClickListener method is use of DialogInterface interface.
@@ -104,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         LocalBroadcastManager.getInstance(MainActivity.this).registerReceiver(mMessageReceiver,
                 new IntentFilter("myFunction"));
+        RefreshList();
     }
 
     @Override
@@ -133,6 +142,8 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
+        getSupportActionBar().setTitle("Plant Journal");
+
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
         }
@@ -146,21 +157,21 @@ public class MainActivity extends AppCompatActivity {
         downloadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                SharedPreferences sharedPreferences = MainActivity.this.getSharedPreferences("MySharedPref", MODE_PRIVATE);
                 manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-                Uri uri = Uri.parse("https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf");
+                Uri uri = Uri.parse(sharedPreferences.getString("download_link",""));
                 DownloadManager.Request request = new DownloadManager.Request(uri);
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
-                request.setDestinationInExternalPublicDir( Environment.DIRECTORY_DOWNLOADS, "test.pdf");
+                request.setDestinationInExternalPublicDir( Environment.DIRECTORY_DOWNLOADS, "today.xlsx");
 
                 long reference = manager.enqueue(request);
             }
         });
-        nameText= findViewById(R.id.plantName);
+
 
         Intent intent = getIntent();
         String name = intent.getStringExtra(NAME);
-
+        nameText= findViewById(R.id.plantName);
         nameText.setText("Welcome new plant! "+name);
 
   //      Toolbar toolbar = findViewById(R.id.toolbar);
@@ -178,8 +189,8 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
 
                 Intent intent = new Intent(MainActivity.this, CreateBiodataActivity.class);
                 startActivity(intent);
@@ -195,44 +206,8 @@ public class MainActivity extends AppCompatActivity {
         }
         RefreshList();
     }
-    private void saveData(){
 
-        String csv_data = "";/// your csv data as string;
-        File root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
 
-        //if you want to create a sub-dir
-        root = new File(root, "SubDir");
-        root.mkdir();
-
-        // select the name for your file
-        root = new File(root , "my_csv.csv");
-
-        try {
-            FileOutputStream fout = new FileOutputStream(root);
-            fout.write(csv_data.getBytes());
-
-            fout.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-
-            boolean bool = false;
-            try {
-                // try to create the file
-                bool = root.createNewFile();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-
-            if (bool){
-                // call the method again
-                saveData();
-            }else {
-//                throw new IllegalStateException("Failed to create image file");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -249,7 +224,8 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            Intent intent = new Intent(this, UserPrefsActivity.class);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
