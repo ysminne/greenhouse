@@ -11,6 +11,7 @@ import android.os.Build;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -45,7 +46,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // TODO(developer): Handle FCM messages here.
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
         Log.d(TAG, "From: " + remoteMessage.getFrom());
-
+        Intent intent = new Intent("myFunction");
+        // add data
+        intent.putExtra("value1", "TEST");
+        intent.putExtra("value2", "TEST");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
@@ -78,8 +83,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
      * @param messageBody FCM message body received.
      */
     private void sendNotification(String messageBody) {
+
         Intent intent = new Intent(this, MainActivity.class);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_IMMUTABLE);
 

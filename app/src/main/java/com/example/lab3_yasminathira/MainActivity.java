@@ -1,16 +1,25 @@
 package com.example.lab3_yasminathira;
 
+import android.Manifest;
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,6 +29,9 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -29,6 +41,11 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.FirebaseApp;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -42,6 +59,58 @@ public class MainActivity extends AppCompatActivity {
                             Toast.LENGTH_LONG).show();
                 }
             });
+    private StringBuilder str_builder;
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Extract data included in the Intent
+            String t = intent.getStringExtra("value1");
+            String t1 = intent.getStringExtra("value2");
+            //alert data here
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+            // Set the message show for the Alert time
+            builder.setMessage("Your plant is having problems");
+
+            // Set Alert Title
+            builder.setTitle("Alert !");
+
+            // Set Cancelable false for when the user clicks on the outside the Dialog Box then it will remain show
+            builder.setCancelable(false);
+
+            // Set the positive button with yes name Lambda OnClickListener method is use of DialogInterface interface.
+            builder.setPositiveButton("Yes", (DialogInterface.OnClickListener) (dialog, which) -> {
+                // When the user click yes button then app will close
+                finish();
+            });
+
+            // Set the Negative button with No name Lambda OnClickListener method is use of DialogInterface interface.
+            builder.setNegativeButton("No", (DialogInterface.OnClickListener) (dialog, which) -> {
+                // If user click no then dialog box is canceled.
+                dialog.cancel();
+            });
+
+            // Create the Alert dialog
+            AlertDialog alertDialog = builder.create();
+            // Show the Alert Dialog box
+            alertDialog.show();
+        }
+    };
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(MainActivity.this).registerReceiver(mMessageReceiver,
+                new IntentFilter("myFunction"));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(MainActivity.this).unregisterReceiver(mMessageReceiver);
+    }
     String[] register;
     ListView ListView01;
     Menu menu;
@@ -54,16 +123,39 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String NAME = "NAME";
     private TextView nameText;
-
-
+    private Button downloadButton;
+    Button button;
+    DownloadManager manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
-        FirebaseApp.initializeApp(this);
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+        }
 
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        }
+
+        FirebaseApp.initializeApp(this);
+        downloadButton = findViewById(R.id.downloadData);
+        downloadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                Uri uri = Uri.parse("https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf");
+                DownloadManager.Request request = new DownloadManager.Request(uri);
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
+                request.setDestinationInExternalPublicDir( Environment.DIRECTORY_DOWNLOADS, "test.pdf");
+
+                long reference = manager.enqueue(request);
+            }
+        });
         nameText= findViewById(R.id.plantName);
 
         Intent intent = getIntent();
@@ -103,7 +195,44 @@ public class MainActivity extends AppCompatActivity {
         }
         RefreshList();
     }
+    private void saveData(){
 
+        String csv_data = "";/// your csv data as string;
+        File root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+
+        //if you want to create a sub-dir
+        root = new File(root, "SubDir");
+        root.mkdir();
+
+        // select the name for your file
+        root = new File(root , "my_csv.csv");
+
+        try {
+            FileOutputStream fout = new FileOutputStream(root);
+            fout.write(csv_data.getBytes());
+
+            fout.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+
+            boolean bool = false;
+            try {
+                // try to create the file
+                bool = root.createNewFile();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
+            if (bool){
+                // call the method again
+                saveData();
+            }else {
+//                throw new IllegalStateException("Failed to create image file");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
