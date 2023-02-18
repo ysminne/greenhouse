@@ -102,6 +102,8 @@ public class UserPrefsActivity extends AppCompatActivity {
                     deleteJournalData();
                     unsubscribeTopic();
                     editor.putString("isSubscribed","false");
+                    editor.putString("plant_name","");
+
                     editor.commit();
                     startActivity(intent);
                 });

@@ -152,25 +152,38 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
 
+        SharedPreferences sharedPreferences = MainActivity.this.getSharedPreferences("MySharedPref", MODE_PRIVATE);
+
         FirebaseApp.initializeApp(this);
         downloadButton = findViewById(R.id.downloadData);
         downloadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SharedPreferences sharedPreferences = MainActivity.this.getSharedPreferences("MySharedPref", MODE_PRIVATE);
-                manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-                Uri uri = Uri.parse(sharedPreferences.getString("download_link",""));
-                DownloadManager.Request request = new DownloadManager.Request(uri);
-                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
-                request.setDestinationInExternalPublicDir( Environment.DIRECTORY_DOWNLOADS, "today.xlsx");
+                String prefsUri = sharedPreferences.getString("download_link","");
+                try {
+                    manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                    Uri uri = Uri.parse(prefsUri);
+                    DownloadManager.Request request = new DownloadManager.Request(uri);
+                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
+                    request.setDestinationInExternalPublicDir( Environment.DIRECTORY_DOWNLOADS, "today.xlsx");
+                    long reference = manager.enqueue(request);
+                }catch (Exception e){
+                    Toast.makeText(MainActivity.this,String.valueOf(e) ,Toast.LENGTH_SHORT).show();
+                }
 
-                long reference = manager.enqueue(request);
             }
         });
 
 
-        Intent intent = getIntent();
-        String name = intent.getStringExtra(NAME);
+        String intentExtras = getIntent().getStringExtra(NAME);;
+        String name ="";
+        if(intentExtras != null){
+            name = intentExtras;
+        }else{
+            name = sharedPreferences.getString("plant_name","placeholder_name");
+
+        }
+
         nameText= findViewById(R.id.plantName);
         nameText.setText("Welcome new plant! "+name);
 
