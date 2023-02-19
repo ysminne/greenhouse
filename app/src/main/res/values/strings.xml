@@ -16,6 +16,10 @@
     <string name="log_token">Log Token</string>
 
     <string name="msg_subscribed">Subscribed to weather topic</string>
+    <string name="msg_subscribed_reminder">Subscribed to reminder topic</string>
+
+    <string name="msg_unsubscribed_reminder">Unsubscribed from reminder topic</string>
+
     <string name="msg_token_fmt" translatable="false">FCM registration Token: %s</string>
 
     <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
@@ -26,6 +30,6 @@
     <!-- [START fcm_default_icon_string] -->
     <string name="default_notification_channel_name" translatable="true">Weather</string>
     <!-- [END fcm_default_icon_string] -->
-    <string name="msg_subscribe_failed">Failed to subscribe to weather topic</string>
+    <string name="msg_subscribe_failed">Failed to subscribe to  topic</string>
     <string name="fcm_message">FCM Message</string>
 </resources>

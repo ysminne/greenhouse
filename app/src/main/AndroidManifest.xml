@@ -2,17 +2,45 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.lab3_yasminathira">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+
     <application
+        android:name=".Startup"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:theme="@style/Theme.Lab3YasminAthira"
         android:supportsRtl="true"
-        android:name=".Startup">
+        android:theme="@style/Theme.Lab3YasminAthira">
+        <activity
+            android:name=".UserPrefsActivity"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="OPEN_SETTINGS" />
 
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+         </activity>
+        <activity
+            android:name=".DetermineActivity"
+            android:exported="true"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".MainActivity"
-            android:exported="false" />
+            android:exported="false">
+            <intent-filter>
+                <action android:name="OPEN_MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".UpdateBiodataActivity"
             android:exported="false" />
@@ -24,17 +52,14 @@
             android:exported="false" />
         <activity
             android:name=".FrontpageActivity"
-            android:exported="true"
+            android:exported="false"
             android:label="@string/app_name"
             android:theme="@style/Theme.Lab3YasminAthira.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
+
         <service
-            android:name="MyFirebaseMessagingService"
+            android:name=".MyFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
